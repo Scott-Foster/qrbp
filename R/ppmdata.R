@@ -277,7 +277,10 @@ quasirandomMethod <- function(npoints, window, covariates=NULL, control,coord){
   samp <- do.call("cbind", lapply(1:(dimension + 1),
                                   function(x) samp[skips[x] + 0:(nSampsToConsider - 1), x]))
 
-  myRange <- apply(potential_sites[-na_sites,], -1, range)[,1:dimension]
+  #same change as before.
+  if( length( na_sites) > ){
+    myRange <- apply(potential_sites[-na_sites,], -1, range)[,1:dimension]
+  }
   for (ii in seq_len(dimension)) samp[, ii] <- myRange[1, ii] + (myRange[2, ii] - myRange[1, ii]) * samp[, ii]
 
   ## study area
