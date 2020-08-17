@@ -265,8 +265,11 @@ quasirandomMethod <- function(npoints, window, covariates=NULL, control,coord){
   potential_sites[na_sites,-1:-2] <- 0
 
   #if npoints>nrow(potential_sites) recursively create a finer grid.
-  if(npoints>nrow(potential_sites[-na_sites,])){
-    stop('more background points than cells avaliable')
+  #SDF: that comment is somewhat misleading -- there is no finer grid.  Just function termination
+  if( length( na_sites)>0){ #only exclude when there is something to exclude.
+    if(npoints>nrow(potential_sites[-na_sites,])){
+      stop('more background points than cells avaliable')
+    }
   }
 
   dimension <- control$quasiDim
