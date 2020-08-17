@@ -272,6 +272,9 @@ quasirandomMethod <- function(npoints, window, covariates=NULL, control,coord){
   dimension <- control$quasiDim
   nSampsToConsider <- control$quasiSamps
 
+  #you don't need to take dimension+1 directions here...  Only dimension.
+  #This code is obviously taken from MBHdesign, where for BAS this is needed.
+  #Do you want to consider using the code snippet that I gave you last week?
   samp <- randtoolbox::halton( nSampsToConsider * 2, dim = dimension + 1, init = TRUE)
   skips <- sample(seq_len(nSampsToConsider), size = dimension + 1, replace = TRUE)
   samp <- do.call("cbind", lapply(1:(dimension + 1),
@@ -283,6 +286,8 @@ quasirandomMethod <- function(npoints, window, covariates=NULL, control,coord){
   }
   for (ii in seq_len(dimension)) samp[, ii] <- myRange[1, ii] + (myRange[2, ii] - myRange[1, ii]) * samp[, ii]
 
+  #Not sure you need the next 8 (or so) lines. They are just checking if the points are in the area.  
+  #They already will be due to the na_sites, won't they?
   ## study area
   study.area <- as.matrix(expand.grid(as.data.frame(apply(potential_sites,-1, range)[,1:dimension])))
   if (dimension == 2){
@@ -290,12 +295,17 @@ quasirandomMethod <- function(npoints, window, covariates=NULL, control,coord){
     tmp <- mgcv::in.out(study.area, samp[,1:dimension])
     samp <- samp[tmp, ]
   }
-
+  #I'm pretty certain that all this is wasted too.
+  #This speaks to inclusion probabilities, not areas / weights / ...
+  #You probably ignore this later on, ... ?
   N <- nrow(potential_sites)
   inclusion_probs <- rep(1/N, N)
   inclusion_probs[na_sites] <- 0
   inclusion_probs1 <- inclusion_probs/max(inclusion_probs)
 
+  #This matches up stuff that would then be ignored.  It could be computationally expensive.  Remove?
+  #It does make me wonder how you match up qr points to covariates though.  Some raster function?  This does that.
+  #But for inclusion probs and then thins qr points to BAS.  You certainly don't want that.
   sampIDs <- class::knn1(potential_sites[,1:dimension],
                          samp[, 1:dimension, drop = FALSE],
                          1:nrow(potential_sites))
